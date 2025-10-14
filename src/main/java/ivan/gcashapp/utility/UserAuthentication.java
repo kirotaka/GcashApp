@@ -3,6 +3,7 @@ package ivan.gcashapp.utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ivan.gcashapp.entity.User;
+import ivan.gcashapp.service.CheckBalance;
 import ivan.gcashapp.service.UserService;
 
 import java.util.Scanner;
@@ -12,6 +13,9 @@ public class UserAuthentication {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CheckBalance checkBalance;
 
     private Scanner scanner = new Scanner(System.in);
     private Long loggedInUserId = null;
@@ -47,8 +51,9 @@ public class UserAuthentication {
             } else {
                 System.out.println("\nLogged in as User ID: " + loggedInUserId);
                 System.out.println("1. Change PIN");
-                System.out.println("2. Logout");
-                System.out.println("3. Exit");
+                System.out.println("2. Check Balance");
+                System.out.println("3. Logout");
+                System.out.println("4. Exit");
                 System.out.print("Choose an option: ");
                 try {
                     int choice = scanner.nextInt();
@@ -58,9 +63,12 @@ public class UserAuthentication {
                             changePin();
                             break;
                         case 2:
-                            logout();
+                            checkBalance();
                             break;
                         case 3:
+                            logout();
+                            break;
+                        case 4:
                             System.out.println("Exiting...");
                             return;
                         default:
@@ -99,8 +107,7 @@ public class UserAuthentication {
         System.out.print("PIN: ");
         String pin = scanner.nextLine().trim();
         try {
-            Long id = userService.login(emailOrNumber, pin);
-            loggedInUserId = id;
+            loggedInUserId = userService.login(emailOrNumber, pin);
             System.out.println("Login successful! Welcome.");
         } catch (IllegalArgumentException e) {
             System.out.println("Login failed: " + e.getMessage());
@@ -118,6 +125,15 @@ public class UserAuthentication {
             System.out.println("PIN changed successfully!");
         } catch (IllegalArgumentException e) {
             System.out.println("PIN change failed: " + e.getMessage());
+        }
+    }
+
+    private void checkBalance() {
+        try {
+            double balance = checkBalance.checkBalance(loggedInUserId);
+            System.out.println("Your current balance is: " + balance);
+        } catch (Exception e) {
+            System.out.println("Error checking balance: " + e.getMessage());
         }
     }
 
