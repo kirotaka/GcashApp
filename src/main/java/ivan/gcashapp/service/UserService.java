@@ -1,9 +1,9 @@
-package service;
+package ivan.gcashapp.service;
 
-import entity.User;
+import ivan.gcashapp.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.UserRepository;
+import ivan.gcashapp.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User register(String name, String email, String number, String pin) {
+    public User register(String name, String email, String numStr, String pin) {
         // Validation
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
@@ -21,11 +21,17 @@ public class UserService {
         if (!email.contains("@") || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid email format");
         }
-        if (number == null || number.length() != 11 || !number.startsWith("09")) {  // Assuming Philippine numbers start with 09
+        if (numStr == null || numStr.length() != 11 || !numStr.startsWith("09")) {
             throw new IllegalArgumentException("Number must be 11 digits starting with 09");
         }
         if (pin == null || pin.length() != 4 || !pin.matches("\\d{4}")) {
             throw new IllegalArgumentException("PIN must be a 4-digit number");
+        }
+        long number;
+        try {
+            number = Long.parseLong(numStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number format");
         }
         // Check if email or number already exists
         if (userRepository.findByEmail(email) != null) {
@@ -47,8 +53,8 @@ public class UserService {
     public Long login(String emailOrNumber, String pin) {
         User user = null;
         try {
-            Integer.parseInt(emailOrNumber);  // Check if it's a number
-            user = userRepository.findByNumber(emailOrNumber);
+            long number = Long.parseLong(emailOrNumber);
+            user = userRepository.findByNumber(number);
         } catch (NumberFormatException e) {
             user = userRepository.findByEmail(emailOrNumber.trim().toLowerCase());
         }

@@ -16,7 +16,6 @@ public class User {
     private long id;
     private String name;
     private String email;
-    private String number;
+    private long number;
     private String pin;
-
 }

@@ -1,9 +1,9 @@
-package repository;
+package ivan.gcashapp.repository;
 
-import entity.User;
+import ivan.gcashapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
-    User findByNumber(String number);
+    User findByNumber(long number);
 }

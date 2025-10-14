@@ -1,8 +1,9 @@
-package utility;
+package ivan.gcashapp.utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import service.UserService;
+import ivan.gcashapp.entity.User;
+import ivan.gcashapp.service.UserService;
 
 import java.util.Scanner;
 
@@ -76,16 +77,16 @@ public class UserAuthentication {
     private void register() {
         System.out.println("Registration:");
         System.out.print("Name: ");
-        String name = scanner.nextLine();
+        String name = scanner.nextLine().trim();
         System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String email = scanner.nextLine().trim();
         System.out.print("Number (11 digits, e.g., 09123456789): ");
-        String number = scanner.nextLine();
+        String numStr = scanner.nextLine().trim();
         System.out.print("PIN (4 digits): ");
-        String pin = scanner.nextLine();
+        String pin = scanner.nextLine().trim();
         try {
-            User user = userService.register(name, email, number, pin);
-            System.out.println("Registration successful! Your User ID is: " + user.get());
+            User user = userService.register(name, email, numStr, pin);
+            System.out.println("Registration successful! Your User ID is: " + user.getId());
         } catch (IllegalArgumentException e) {
             System.out.println("Registration failed: " + e.getMessage());
         }
@@ -93,10 +94,10 @@ public class UserAuthentication {
 
     private void login() {
         System.out.println("Login:");
-        System.out.print("Email or Number: ");
-        String emailOrNumber = scanner.nextLine();
+        System.out.print("Enter your Email or Phone Number: ");
+        String emailOrNumber = scanner.nextLine().trim();
         System.out.print("PIN: ");
-        String pin = scanner.nextLine();
+        String pin = scanner.nextLine().trim();
         try {
             Long id = userService.login(emailOrNumber, pin);
             loggedInUserId = id;
@@ -109,9 +110,9 @@ public class UserAuthentication {
     private void changePin() {
         System.out.println("Change PIN:");
         System.out.print("Old PIN: ");
-        String oldPin = scanner.nextLine();
+        String oldPin = scanner.nextLine().trim();
         System.out.print("New PIN (4 digits): ");
-        String newPin = scanner.nextLine();
+        String newPin = scanner.nextLine().trim();
         try {
             userService.changePin(loggedInUserId, oldPin, newPin);
             System.out.println("PIN changed successfully!");
