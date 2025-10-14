@@ -1,4 +1,4 @@
-package entity;
+package ivan.gcashapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +16,7 @@ public class User {
     private long id;
     private String name;
     private String email;
-    private int number;
-    private int pin;
+    private String number;
+    private String pin;
 
 }

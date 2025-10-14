@@ -1,4 +1,4 @@
-package service;
+package ivan.gcashapp.service;
 
 public class Registration {
 }
