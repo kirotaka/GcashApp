@@ -1,6 +1,5 @@
 package ivan.gcashapp.entity;
 
-
 import lombok.*;
 
 @Getter
@@ -8,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class User {
 
     private long id;
@@ -15,4 +15,5 @@ public class User {
     private String email;
     private long number;
     private String pin;
+    private double balance;
 }
