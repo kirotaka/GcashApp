@@ -18,5 +18,4 @@ public class User {
     private String email;
     private long number;
     private String pin;
-    private double balance;
 }
