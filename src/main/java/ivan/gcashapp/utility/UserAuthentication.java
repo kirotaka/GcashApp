@@ -3,7 +3,7 @@ package ivan.gcashapp.utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ivan.gcashapp.entity.User;
-import ivan.gcashapp.repository.UserRepository;
+import ivan.gcashapp.dao.UserDao;
 import ivan.gcashapp.service.CashTransfer;
 import ivan.gcashapp.service.CashIn;
 import ivan.gcashapp.service.CheckBalance;
@@ -27,7 +27,7 @@ public class UserAuthentication {
     private CashTransfer cashTransfer;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     private Scanner scanner = new Scanner(System.in);
     private Long loggedInUserId = null;
@@ -180,7 +180,7 @@ public class UserAuthentication {
         long recipientId;
         try {
             long recipientNum = Long.parseLong(recipientNumStr);
-            User recipient = userRepository.findByNumber(recipientNum);
+            User recipient = userDao.findByNumber(recipientNum);
             if (recipient == null) {
                 System.out.println("Recipient not found. Please check the phone number.");
                 return;

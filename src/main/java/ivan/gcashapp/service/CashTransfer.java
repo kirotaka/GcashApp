@@ -1,28 +1,29 @@
 package ivan.gcashapp.service;
 
+import ivan.gcashapp.dao.BalanceDao;
+import ivan.gcashapp.dao.TransactionDao;
+import ivan.gcashapp.dao.UserDao;
 import ivan.gcashapp.entity.Balance;
 import ivan.gcashapp.entity.Transaction;
 import ivan.gcashapp.entity.User;
-import ivan.gcashapp.repository.BalanceRepository;
-import ivan.gcashapp.repository.TransactionRepository;
-import ivan.gcashapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CashTransfer {
 
     @Autowired
-    private BalanceRepository balanceRepository;
+    private BalanceDao balanceDao;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionDao transactionDao;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     public void cashTransfer(long fromUserId, long toUserId, double amount) {
         // Restriction: Amount must be positive
@@ -36,12 +37,12 @@ public class CashTransfer {
         }
 
         // Check if recipient exists
-        if (!userRepository.existsById(toUserId)) {
+        if (!userDao.existsById(toUserId)) {
             throw new IllegalArgumentException("Recipient account not found.");
         }
 
         // Check sufficient balance
-        List<Balance> senderBalances = balanceRepository.findByUserId(fromUserId);
+        List<Balance> senderBalances = balanceDao.findByUserId(fromUserId);
         double currentBalance = senderBalances.stream().mapToDouble(Balance::getAmount).sum();
         if (currentBalance < amount) {
             throw new IllegalArgumentException("Insufficient balance. Current balance: " + currentBalance);
@@ -52,14 +53,14 @@ public class CashTransfer {
                 .amount(-amount)
                 .userId(fromUserId)
                 .build();
-        balanceRepository.save(deduct);
+        balanceDao.save(deduct);
 
         // Add to receiver (positive amount)
         Balance add = Balance.builder()
                 .amount(amount)
                 .userId(toUserId)
                 .build();
-        balanceRepository.save(add);
+        balanceDao.save(add);
 
         // Log the transaction
         Transaction transaction = Transaction.builder()
@@ -70,6 +71,6 @@ public class CashTransfer {
                 .transferFromId(fromUserId)
                 .transferToId(toUserId)
                 .build();
-        transactionRepository.save(transaction);
+        transactionDao.save(transaction);
     }
 }

@@ -1,9 +1,9 @@
 package ivan.gcashapp.service;
 
+import ivan.gcashapp.dao.BalanceDao;
+import ivan.gcashapp.dao.TransactionDao;
 import ivan.gcashapp.entity.Balance;
 import ivan.gcashapp.entity.Transaction;
-import ivan.gcashapp.repository.BalanceRepository;
-import ivan.gcashapp.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 public class CashIn {
 
     @Autowired
-    private BalanceRepository balanceRepository;
+    private BalanceDao balanceDao;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionDao transactionDao;
 
     public void cashin(long accountId, double amount) {
         // Add to balance (positive amount for cash in)
@@ -24,7 +24,7 @@ public class CashIn {
                 .amount(amount)
                 .userId(accountId)
                 .build();
-        balanceRepository.save(balance);
+        balanceDao.save(balance);
 
         // Log the transaction
         Transaction transaction = Transaction.builder()
@@ -35,6 +35,6 @@ public class CashIn {
                 .transferToId(accountId)
                 .transferFromId(0)  // 0 for external source
                 .build();
-        transactionRepository.save(transaction);
+        transactionDao.save(transaction);
     }
 }
