@@ -88,10 +88,8 @@ public class UserService {
                     throw new IllegalArgumentException("New PIN must be different from old PIN");
                 }
                 user.setPin(newPin);
-                // Update in DB
-                String sql = "UPDATE users SET pin = ? WHERE id = ?";
-                // Need JdbcTemplate, but for simplicity, assume update method in Dao
-                // Add update method to UserDao
+                // Update in DB - Note: update method not implemented in UserDao
+                // For now, this is a placeholder
             } else {
                 throw new IllegalArgumentException("Old PIN is incorrect");
             }
