@@ -1,14 +1,12 @@
 package ivan.gcashapp.utility;
 
+import ivan.gcashapp.dao.UserDao;
+import ivan.gcashapp.entity.User;
+import ivan.gcashapp.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ivan.gcashapp.entity.User;
-import ivan.gcashapp.dao.UserDao;
-import ivan.gcashapp.service.CashTransfer;
-import ivan.gcashapp.service.CashIn;
-import ivan.gcashapp.service.CheckBalance;
-import ivan.gcashapp.service.UserService;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 @Component
@@ -21,7 +19,7 @@ public class UserAuthentication {
     private CheckBalance checkBalance;
 
     @Autowired
-    private CashIn cashin;
+    private CashIn cashIn;
 
     @Autowired
     private CashTransfer cashTransfer;
@@ -166,7 +164,7 @@ public class UserAuthentication {
                 System.out.println("Amount must be positive.");
                 return;
             }
-            cashin.cashin(loggedInUserId, amount);
+            cashIn.cashin(loggedInUserId, amount);
             System.out.println("Cash in successful!");
         } catch (Exception e) {
             System.out.println("Invalid amount. Please enter a number.");
@@ -180,12 +178,12 @@ public class UserAuthentication {
         long recipientId;
         try {
             long recipientNum = Long.parseLong(recipientNumStr);
-            User recipient = userDao.findByNumber(recipientNum);
-            if (recipient == null) {
+            Optional<User> recipientOpt = userDao.findByNumber(recipientNum);
+            if (recipientOpt.isEmpty()) {
                 System.out.println("Recipient not found. Please check the phone number.");
                 return;
             }
-            recipientId = recipient.getId();
+            recipientId = recipientOpt.get().getId();
         } catch (NumberFormatException e) {
             System.out.println("Invalid phone number format.");
             return;

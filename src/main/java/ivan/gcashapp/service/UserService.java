@@ -34,7 +34,7 @@ public class UserService {
             throw new IllegalArgumentException("Invalid number format");
         }
         // Check if email or number already exists
-        if (userDao.findByEmail(email).isPresent()) {
+        if (userDao.findByEmail(email.trim()).isPresent()) {
             throw new IllegalArgumentException("Email already registered");
         }
         if (userDao.findByNumber(number).isPresent()) {
@@ -43,7 +43,7 @@ public class UserService {
 
         User user = User.builder()
                 .name(name.trim())
-                .email(email.trim().toLowerCase())
+                .email(email.trim())
                 .number(number)
                 .pin(pin)
                 .balance(1000.0)  // Set initial balance
@@ -60,7 +60,7 @@ public class UserService {
                 user = opt.get();
             }
         } catch (NumberFormatException e) {
-            Optional<User> opt = userDao.findByEmail(emailOrNumber.trim().toLowerCase());
+            Optional<User> opt = userDao.findByEmail(emailOrNumber.trim());
             if (opt.isPresent()) {
                 user = opt.get();
             }

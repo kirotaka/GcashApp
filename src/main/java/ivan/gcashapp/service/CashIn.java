@@ -3,7 +3,7 @@ package ivan.gcashapp.service;
 import ivan.gcashapp.dao.BalanceDao;
 import ivan.gcashapp.dao.TransactionDao;
 import ivan.gcashapp.entity.Balance;
-import ivan.gcashapp.entity.Transaction;
+import ivan.gcashapp.entity.CashTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class CashIn {
         balanceDao.save(balance);
 
         // Log the transaction
-        Transaction transaction = Transaction.builder()
+        CashTransaction cashTransaction = CashTransaction.builder()
                 .amount(amount)
                 .name("Cash In")
                 .accountId(accountId)
@@ -35,6 +35,6 @@ public class CashIn {
                 .transferToId(accountId)
                 .transferFromId(0)  // 0 for external source
                 .build();
-        transactionDao.save(transaction);
+        transactionDao.save(cashTransaction);
     }
 }

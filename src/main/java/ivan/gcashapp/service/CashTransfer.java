@@ -4,14 +4,12 @@ import ivan.gcashapp.dao.BalanceDao;
 import ivan.gcashapp.dao.TransactionDao;
 import ivan.gcashapp.dao.UserDao;
 import ivan.gcashapp.entity.Balance;
-import ivan.gcashapp.entity.Transaction;
-import ivan.gcashapp.entity.User;
+import ivan.gcashapp.entity.CashTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CashTransfer {
@@ -63,7 +61,7 @@ public class CashTransfer {
         balanceDao.save(add);
 
         // Log the transaction
-        Transaction transaction = Transaction.builder()
+        CashTransaction cashTransaction = CashTransaction.builder()
                 .amount(amount)
                 .name("Transfer")
                 .accountId(fromUserId)
@@ -71,6 +69,6 @@ public class CashTransfer {
                 .transferFromId(fromUserId)
                 .transferToId(toUserId)
                 .build();
-        transactionDao.save(transaction);
+        transactionDao.save(cashTransaction);
     }
 }
