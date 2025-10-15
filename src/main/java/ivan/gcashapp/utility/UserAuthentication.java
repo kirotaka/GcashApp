@@ -1,11 +1,13 @@
 package ivan.gcashapp.utility;
 
 import ivan.gcashapp.dao.UserDao;
+import ivan.gcashapp.entity.CashTransaction;
 import ivan.gcashapp.entity.User;
 import ivan.gcashapp.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -26,6 +28,9 @@ public class UserAuthentication {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private Transactions transactions;
 
     private Scanner scanner = new Scanner(System.in);
     private Long loggedInUserId = null;
@@ -64,8 +69,9 @@ public class UserAuthentication {
                 System.out.println("2. Check Balance");
                 System.out.println("3. Cash In");
                 System.out.println("4. Cash Transfer");
-                System.out.println("5. Logout");
-                System.out.println("6. Exit");
+                System.out.println("5. View Transactions");
+                System.out.println("6. Logout");
+                System.out.println("7. Exit");
                 System.out.print("Choose an option: ");
                 try {
                     int choice = scanner.nextInt();
@@ -73,20 +79,28 @@ public class UserAuthentication {
                     switch (choice) {
                         case 1:
                             changePin();
+                            askContinue();
                             break;
                         case 2:
                             checkBalance();
+                            askContinue();
                             break;
                         case 3:
                             cashIn();
+                            askContinue();
                             break;
                         case 4:
                             cashTransfer();
+                            askContinue();
                             break;
                         case 5:
-                            logout();
+                            viewTransactions();
+                            askContinue();
                             break;
                         case 6:
+                            logout();
+                            break;
+                        case 7:
                             System.out.println("Exiting...");
                             return;
                         default:
@@ -97,6 +111,49 @@ public class UserAuthentication {
                     scanner.nextLine();
                 }
             }
+        }
+    }
+
+    private void askContinue() {
+        System.out.print("Do you want to perform another transaction? (y/n): ");
+        String choice = scanner.nextLine().trim().toLowerCase();
+        if (choice.equals("y")) {
+            while (true) {
+                System.out.println("1. Check Balance");
+                System.out.println("2. Cash In");
+                System.out.println("3. Cash Transfer");
+                System.out.println("4. View Transactions");
+                System.out.println("5. Exit");
+                System.out.print("Choose an option: ");
+                try {
+                    int choice2 = scanner.nextInt();
+                    scanner.nextLine();
+                    switch (choice2) {
+                        case 1:
+                            checkBalance();
+                            break;
+                        case 2:
+                            cashIn();
+                            break;
+                        case 3:
+                            cashTransfer();
+                            break;
+                        case 4:
+                            viewTransactions();
+                            break;
+                        case 5:
+                            logout();
+                            return;
+                        default:
+                            System.out.println("Invalid option. Try again.");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.nextLine();
+                }
+            }
+        } else {
+
         }
     }
 
@@ -204,6 +261,21 @@ public class UserAuthentication {
         } catch (Exception e) {
             System.out.println("Invalid amount. Please enter a number.");
             scanner.nextLine();
+        }
+    }
+
+    private void viewTransactions() {
+        try {
+            List<CashTransaction> trans = transactions.viewUserAll(loggedInUserId);
+            if (trans.isEmpty()) {
+                System.out.println("No transactions found.");
+            } else {
+                for (CashTransaction t : trans) {
+                    System.out.println("ID: " + t.getId() + ", Amount: " + t.getAmount() + ", Name: " + t.getName() + ", Date: " + t.getDate());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error viewing transactions: " + e.getMessage());
         }
     }
 
