@@ -12,10 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class BalanceDaoTest {
+public class BalanceDaoTest {
 
     @Autowired
-    private BalanceDao balanceDao;
+    private BalanceDaoTest balanceDaoTest;
 
     @Test
     void testSaveAndFindByUserId() {
