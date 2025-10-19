@@ -1,13 +1,15 @@
-package ivan.gcashapp.dao;
+package ivan.gcashapp.service;  // Match the directory structure
 
 import ivan.gcashapp.TestConfig;
 import ivan.gcashapp.entity.CashTransaction;
+import ivan.gcashapp.dao.TransactionDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,9 +17,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.cli.enabled=false")
 @Import(TestConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class TransactionsTest {
 
     @Autowired
@@ -39,7 +42,7 @@ public class TransactionsTest {
 
         List<CashTransaction> txs = transactionDao.findByAccountId(accountId);
 
-        assertFalse(txs.isEmpty());
+        assertFalse(txs.isEmpty());  // Changed from assertTrue to assertFalse
         boolean hasDeposit = txs.stream().anyMatch(t -> Double.valueOf(150.0).equals(t.getAmount()));
         boolean hasPurchase = txs.stream().anyMatch(t -> Double.valueOf(-20.0).equals(t.getAmount()));
         assertTrue(hasDeposit);

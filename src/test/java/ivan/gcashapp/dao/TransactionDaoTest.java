@@ -30,63 +30,35 @@ public class TransactionDaoTest {
 
     @BeforeEach
     void setUpDummyData() {
-        // clean tables (safe to run even if table doesn't exist in some setups)
-        try {
-            jdbcTemplate.update("DELETE FROM transaction");
-        } catch (Exception ignored) {}
-        try {
-            jdbcTemplate.update("DELETE FROM cash_transaction");
-        } catch (Exception ignored) {}
+        // clean tables
+        jdbcTemplate.update("DELETE FROM cash_transaction");
 
         LocalDateTime now = LocalDateTime.now();
 
         // Insert dummy rows into the database with explicit ids so tests can query by id
-        try {
-            jdbcTemplate.update(
-                    "INSERT INTO transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    100L, 150.0, "Deposit", 1L, Timestamp.valueOf(now), null, null
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    101L, -20.0, "Purchase", 1L, Timestamp.valueOf(now), null, null
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    102L, 75.0, "Transfer In", 2L, Timestamp.valueOf(now), 2L, 3L
-            );
-        } catch (Exception ignored) {
-            // If the `transaction` table name differs (e.g. `cash_transaction`), try that as fallback
-            jdbcTemplate.update(
-                    "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    100L, 150.0, "Deposit", 1L, Timestamp.valueOf(now), null, null
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    101L, -20.0, "Purchase", 1L, Timestamp.valueOf(now), null, null
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    102L, 75.0, "Transfer In", 2L, Timestamp.valueOf(now), 2L, 3L
-            );
-        }
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                100L, 150.0, "Deposit", 1L, Timestamp.valueOf(now), null, null
+        );
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                101L, -20.0, "Purchase", 1L, Timestamp.valueOf(now), null, null
+        );
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                102L, 75.0, "Transfer In", 2L, Timestamp.valueOf(now), 2L, 3L
+        );
     }
 
     @Test
-    void testSaveAndFindById() {
+   void testSaveAndFindById() {
         // Insert a known record (DAO.save with JdbcTemplate does not populate generated id)
         LocalDateTime now = LocalDateTime.now();
         long knownId = 500L;
-        try {
-            jdbcTemplate.update(
-                    "INSERT INTO transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    knownId, 100.0, "Test Transaction", 9L, Timestamp.valueOf(now), 2L, 1L
-            );
-        } catch (Exception ignored) {
-            jdbcTemplate.update(
-                    "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    knownId, 100.0, "Test Transaction", 9L, Timestamp.valueOf(now), 2L, 1L
-            );
-        }
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                knownId, 100.0, "Test Transaction", 9L, Timestamp.valueOf(now), 2L, 1L
+        );
 
         Optional<CashTransaction> found = transactionDao.findById(knownId);
 

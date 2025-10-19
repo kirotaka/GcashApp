@@ -26,12 +26,12 @@ public class TransactionDao {
     }
 
     public List<CashTransaction> findAll() {
-        String sql = "SELECT * FROM transaction";
+        String sql = "SELECT * FROM cash_transaction";
         return jdbcTemplate.query(sql, new TransactionRowMapper());
     }
 
     public List<CashTransaction> findByAccountId(long accountId) {
-        String sql = "SELECT * FROM transaction WHERE account_id = ?";
+        String sql = "SELECT * FROM cash_transaction WHERE account_id = ?";
         return jdbcTemplate.query(sql, new TransactionRowMapper(), accountId);
     }
 
