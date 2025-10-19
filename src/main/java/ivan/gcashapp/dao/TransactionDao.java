@@ -19,7 +19,7 @@ public class TransactionDao {
     private JdbcTemplate jdbcTemplate;
 
     public CashTransaction save(CashTransaction cashTransaction) {
-        String sql = "INSERT INTO transaction (amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cash_transaction (amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, cashTransaction.getAmount(), cashTransaction.getName(), cashTransaction.getAccountId(),
                 cashTransaction.getDate(), cashTransaction.getTransferToId(), cashTransaction.getTransferFromId());
         return cashTransaction;
@@ -36,7 +36,7 @@ public class TransactionDao {
     }
 
     public Optional<CashTransaction> findById(long id) {
-        String sql = "SELECT * FROM transaction WHERE id = ?";
+        String sql = "SELECT * FROM cash_transaction WHERE id = ?";
         List<CashTransaction> cashTransactions = jdbcTemplate.query(sql, new TransactionRowMapper(), id);
         return cashTransactions.stream().findFirst();
     }
