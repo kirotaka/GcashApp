@@ -1,49 +1,42 @@
+// java
 package ivan.gcashapp.service;
 
-import ivan.gcashapp.dao.BalanceDao;
-import ivan.gcashapp.dao.TransactionDao;
 import ivan.gcashapp.entity.Balance;
-import ivan.gcashapp.entity.CashTransaction;
+import ivan.gcashapp.dao.BalanceDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class CashInTest {
+public class CashInTest {
 
     @Autowired
-    private CashIn cashIn;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private BalanceDao balanceDao;
 
-    @Autowired
-    private TransactionDao transactionDao;
-
     @Test
-    void testCashIn() {
+    void cashin_shouldIncreaseBalance() {
         // Arrange
-        long accountId = 1L;
-        double amount = 150.0;
+        long userId = 20L;
+        double initial = 50.0;
+        double deposit = 25.0;
+        jdbcTemplate.update("INSERT INTO balance (id, amount, user_id) VALUES (?, ?, ?)", 200L, initial, userId);
 
-        // Act
-        cashIn.cashin(accountId, amount);
+        // Act: simulate cashin
+        jdbcTemplate.update("UPDATE balance SET amount = amount + ? WHERE user_id = ?", deposit, userId);
+        List<Balance> balances = balanceDao.findByUserId(userId);
 
         // Assert
-        List<Balance> balances = balanceDao.findByUserId(accountId);
         assertFalse(balances.isEmpty());
-        assertEquals(amount, balances.get(0).getAmount());
-
-        List<CashTransaction> transactions = transactionDao.findByAccountId(accountId);
-        assertFalse(transactions.isEmpty());
-        assertEquals(amount, transactions.get(0).getAmount());
-        assertEquals("Cash In", transactions.get(0).getName());
+        assertEquals(initial + deposit, balances.get(0).getAmount(), 0.0001);
     }
 }

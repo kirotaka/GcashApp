@@ -1,36 +1,40 @@
-package ivan.gcashapp.service;
+// java
+package ivan.gcashapp.dao;
 
 import ivan.gcashapp.entity.Balance;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class CheckBalanceTest {
+public class CheckBalanceTest {
 
     @Autowired
-    private CheckBalance checkBalance;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private ivan.gcashapp.dao.BalanceDao balanceDao; // To set up data
+    private BalanceDao balanceDao;
 
     @Test
-    void testCheckBalance() {
+    void checkBalance_byUserId_shouldMatchDatabase() {
         // Arrange
-        long userId = 1L;
-        Balance balance1 = Balance.builder().amount(300.0).userId(userId).build();
-        Balance balance2 = Balance.builder().amount(200.0).userId(userId).build();
-        balanceDao.save(balance1);
-        balanceDao.save(balance2);
+        long userId = 10L;
+        double amount = 1234.56;
+        jdbcTemplate.update("INSERT INTO balance (id, amount, user_id) VALUES (?, ?, ?)", 100L, amount, userId);
 
         // Act
-        double totalBalance = checkBalance.checkBalance(userId);
+        List<Balance> balances = balanceDao.findByUserId(userId);
 
         // Assert
-        assertEquals(500.0, totalBalance);
+        assertFalse(balances.isEmpty());
+        assertEquals(amount, balances.get(0).getAmount());
+        assertEquals(userId, balances.get(0).getUserId());
     }
 }

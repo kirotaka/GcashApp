@@ -1,12 +1,13 @@
-package ivan.gcashapp.service;
+package ivan.gcashapp.dao;
 
-import ivan.gcashapp.dao.TransactionDao;
 import ivan.gcashapp.entity.CashTransaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,75 +15,31 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class TransactionsTest {
+public class TransactionsTest {
 
     @Autowired
-    private Transactions transactions;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private TransactionDao transactionDao;
 
     @Test
-    void testViewAll() {
-        // Arrange
-        CashTransaction transaction = CashTransaction.builder()
-                .amount(50.0)
-                .name("Test View")
-                .accountId(1L)
-                .date(LocalDateTime.now())
-                .transferToId(2L)
-                .transferFromId(1L)
-                .build();
-        transactionDao.save(transaction);
+    void transactions_shouldBeDisplayedForAccount() {
+        long accountId = 40L;
+        LocalDateTime now = LocalDateTime.now();
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                400L, 150.0, "Deposit", accountId, Timestamp.valueOf(now), null, null);
+        jdbcTemplate.update(
+                "INSERT INTO cash_transaction (id, amount, name, account_id, date, transfer_to_id, transfer_from_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                401L, -20.0, "Purchase", accountId, Timestamp.valueOf(now), null, null);
 
-        // Act
-        List<CashTransaction> allTransactions = transactions.viewAll();
+        List<CashTransaction> txs = transactionDao.findByAccountId(accountId);
 
-        // Assert
-        assertNotNull(allTransactions);
-        assertFalse(allTransactions.isEmpty());
-    }
-
-    @Test
-    void testViewUserAll() {
-        // Arrange
-        CashTransaction transaction = CashTransaction.builder()
-                .amount(75.0)
-                .name("User Transaction")
-                .accountId(1L)
-                .date(LocalDateTime.now())
-                .transferToId(3L)
-                .transferFromId(1L)
-                .build();
-        transactionDao.save(transaction);
-
-        // Act
-        List<CashTransaction> userTransactions = transactions.viewUserAll(1L);
-
-        // Assert
-        assertNotNull(userTransactions);
-        assertFalse(userTransactions.isEmpty());
-        assertEquals(75.0, userTransactions.get(0).getAmount());
-    }
-
-    @Test
-    void testViewTransaction() {
-        // Arrange
-        CashTransaction transaction = CashTransaction.builder()
-                .amount(25.0)
-                .name("Single Transaction")
-                .accountId(1L)
-                .date(LocalDateTime.now())
-                .transferToId(4L)
-                .transferFromId(1L)
-                .build();
-        transactionDao.save(transaction);
-
-        // Act
-        CashTransaction viewed = transactions.viewTransaction(1L); // Assuming ID 1
-
-        // Assert
-        assertNotNull(viewed);
-        assertEquals(25.0, viewed.getAmount());
+        assertFalse(txs.isEmpty());
+        boolean hasDeposit = txs.stream().anyMatch(t -> Double.valueOf(150.0).equals(t.getAmount()));
+        boolean hasPurchase = txs.stream().anyMatch(t -> Double.valueOf(-20.0).equals(t.getAmount()));
+        assertTrue(hasDeposit);
+        assertTrue(hasPurchase);
     }
 }

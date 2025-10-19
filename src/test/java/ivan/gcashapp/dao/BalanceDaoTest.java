@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BalanceDaoTest {
 
     @Autowired
-    private BalanceDaoTest balanceDaoTest;
+    private BalanceDao balanceDao;
 
     @Test
     void testSaveAndFindByUserId() {
